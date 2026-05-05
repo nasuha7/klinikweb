@@ -1,100 +1,77 @@
 @extends('layouts.admin')
 
 @section('title', 'Kelola Dokter')
+@section('page-title', 'Kelola Dokter')
 
 @section('content')
-<div class="p-6">
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-800">Kelola Dokter</h1>
-            <p class="text-gray-600">Tambah, edit, atau hapus data dokter</p>
-        </div>
-        <a href="{{ route('admin.dokter.create') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+<div class="bg-white rounded-lg shadow-md p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-800">Daftar Dokter</h2>
+        <button onclick="alert('Tambah dokter baru')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
             <i class="fas fa-plus mr-2"></i> Tambah Dokter
-        </a>
+        </button>
     </div>
-
-    <!-- Tabs -->
-    <div class="border-b mb-6">
-        <ul class="flex space-x-4">
-            <li>
-                <a href="#" class="inline-block py-2 px-4 text-blue-600 border-b-2 border-blue-600 font-semibold">Semua Dokter</a>
-            </li>
-            <li>
-                <a href="#" class="inline-block py-2 px-4 text-gray-600 hover:text-blue-600">Terverifikasi</a>
-            </li>
-            <li>
-                <a href="#" class="inline-block py-2 px-4 text-gray-600 hover:text-blue-600">Menunggu</a>
-            </li>
-        </ul>
-    </div>
-
-    <!-- Table Dokter -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Spesialis</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Telepon</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    @foreach($dokters as $dokter)
-                    <tr>
-                        <td class="px-6 py-4">{{ $dokter['id'] }}</td>
-                        <td class="px-6 py-4 font-medium">{{ $dokter['nama'] }}</td>
-                        <td class="px-6 py-4">{{ $dokter['spesialis'] }}</td>
-                        <td class="px-6 py-4">{{ $dokter['email'] }}</td>
-                        <td class="px-6 py-4">{{ $dokter['telepon'] }}</td>
-                        <td class="px-6 py-4">
-                            @if($dokter['status'] == 'approved')
-                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Terverifikasi</span>
-                            @elseif($dokter['status'] == 'pending')
-                                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Menunggu</span>
-                            @else
-                                <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Ditolak</span>
-                            @endif
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex space-x-2">
-                                <a href="{{ route('admin.dokter.edit', $dokter['id']) }}" class="text-blue-500 hover:text-blue-700">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <button onclick="deleteDokter({{ $dokter['id'] }})" class="text-red-500 hover:text-red-700">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                @if($dokter['status'] == 'pending')
-                                <button onclick="verifyDokter({{ $dokter['id'] }})" class="text-green-500 hover:text-green-700">
-                                    <i class="fas fa-check-circle"></i>
-                                </button>
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-2 text-left">Nama</th>
+                    <th class="px-4 py-2 text-left">Spesialis</th>
+                    <th class="px-4 py-2 text-left">Email</th>
+                    <th class="px-4 py-2 text-left">Telepon</th>
+                    <th class="px-4 py-2 text-left">Status</th>
+                    <th class="px-4 py-2 text-left">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="dokterTableBody"></tbody>
+        </table>
     </div>
 </div>
 
 <script>
-    function deleteDokter(id) {
-        if(confirm('Yakin ingin menghapus dokter ini?')) {
-            window.location.href = '/admin/dokter/delete/' + id;
+    const dokterData = [
+        { id: 1, nama: 'dr. Andi Wijaya, Sp.PD', spesialis: 'Penyakit Dalam', email: 'andi@dokter.com', telepon: '081234567890', status: 'approved' },
+        { id: 2, nama: 'dr. Siti Rahma, Sp.A', spesialis: 'Anak', email: 'siti@dokter.com', telepon: '081234567891', status: 'approved' },
+        { id: 3, nama: 'dr. Budi Santoso', spesialis: 'Umum', email: 'budi@dokter.com', telepon: '081234567892', status: 'pending' },
+        { id: 4, nama: 'dr. Maya Sari', spesialis: 'Mata', email: 'maya@dokter.com', telepon: '081234567893', status: 'pending' },
+        { id: 5, nama: 'dr. Rizki Fadillah', spesialis: 'Kulit', email: 'rizki@dokter.com', telepon: '081234567894', status: 'approved' }
+    ];
+    
+    function renderDokter() {
+        let html = '';
+        for (const d of dokterData) {
+            const statusBadge = d.status === 'approved' 
+                ? '<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Approved</span>'
+                : '<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Pending</span>';
+            
+            html += `
+                <tr class="border-b">
+                    <td class="px-4 py-2">${d.nama}</td>
+                    <td class="px-4 py-2">${d.spesialis}</td>
+                    <td class="px-4 py-2">${d.email}</td>
+                    <td class="px-4 py-2">${d.telepon}</td>
+                    <td class="px-4 py-2">${statusBadge}</td>
+                    <td class="px-4 py-2">
+                        <button onclick="editDokter(${d.id})" class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-edit"></i></button>
+                        <button onclick="hapusDokter(${d.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        }
+        document.getElementById('dokterTableBody').innerHTML = html;
+    }
+    
+    function editDokter(id) {
+        alert('Edit dokter dengan ID: ' + id);
+    }
+    
+    function hapusDokter(id) {
+        if (confirm('Hapus dokter ini?')) {
+            alert('Dokter berhasil dihapus');
         }
     }
     
-    function verifyDokter(id) {
-        if(confirm('Verifikasi dokter ini?')) {
-            window.location.href = '/admin/dokter/verify/' + id;
-        }
-    }
+    renderDokter();
 </script>
 @endsection

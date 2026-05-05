@@ -13,7 +13,7 @@
 
 <body class="bg-gray-100">
     <!-- Navbar User -->
-    <x-user.navbar />
+    <x-pasien.navbar />
 
     <!-- Main Content -->
     <main class="min-h-screen pb-16">

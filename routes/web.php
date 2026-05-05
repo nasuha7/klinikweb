@@ -14,6 +14,14 @@ use App\Http\Controllers\DashboardPasienController;
 | Web Routes
 |--------------------------------------------------------------------------
 */
+// ==================== DASHBOARD ROUTES (untuk redirect setelah login) ====================
+Route::prefix('dashboard')->name('dashboard.')->group(function () {
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin');
+    Route::get('/dokter', [DokterDashboardController::class, 'index'])->name('dokter');
+    Route::get('/pasien', [DashboardPasienController::class, 'index'])->name('pasien');
+});
+
+
 
 // ==================== HOME & PUBLIC ROUTES ====================
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -25,13 +33,6 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-// ==================== DASHBOARD ROUTES ====================
-Route::prefix('dashboard')->name('dashboard.')->group(function () {
-    Route::get('/admin', [AdminController::class, 'index'])->name('admin');
-    Route::get('/dokter', [DokterDashboardController::class, 'index'])->name('dokter');
-    Route::get('/pasien', [DashboardPasienController::class, 'index'])->name('pasien');
-});
 
 // ==================== ADMIN ROUTES ====================
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -96,7 +97,7 @@ Route::prefix('dokter')->name('dokter.')->group(function () {
     
     // Konsultasi
     Route::prefix('konsultasi')->name('konsultasi.')->group(function () {
-        Route::get('/mulai/{id}', [DokterDashboardController::class, 'mulaiKonsultasi'])->name('mulai');
+        Route::post('/mulai/{id}', [DokterDashboardController::class, 'mulaiKonsultasi'])->name('mulai');
         Route::get('/selesai/{id}', [DokterDashboardController::class, 'selesaiKonsultasi'])->name('selesai');
         Route::get('/riwayat', [DokterDashboardController::class, 'riwayatKonsultasi'])->name('riwayat');
         Route::get('/detail/{id}', [DokterDashboardController::class, 'detailKonsultasi'])->name('detail');
@@ -119,7 +120,7 @@ Route::prefix('pasien')->name('pasien.')->group(function () {
     Route::get('/profile', [DashboardPasienController::class, 'profile'])->name('profile');
     Route::put('/profile/update', [DashboardPasienController::class, 'updateProfile'])->name('profile.update');
     
-    // Reservasi
+    // Reservasi (Buat Janji)
     Route::get('/reservasi', [ReservasiController::class, 'create'])->name('reservasi.create');
     Route::post('/reservasi', [ReservasiController::class, 'store'])->name('reservasi.store');
     Route::get('/reservasi/success', [ReservasiController::class, 'success'])->name('reservasi.success');
